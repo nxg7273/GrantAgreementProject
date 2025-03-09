@@ -33,7 +33,38 @@ graphql
 
 Copy
 
-`. ├── .checkov.policy.yaml       # Custom Checkov rules for mandatory tags ├── .gitignore                 # Ignore local Terraform state/cache files ├── .tflint.hcl                # TFLint config: enforces required tag keys ├── azure-pipelines.yml        # Azure DevOps pipeline for CI/CD ├── backend.tf                 # Remote state backend config (S3 + DynamoDB) ├── data.tf                    # Example data lookups (e.g., caller identity) ├── locals.tf                  # Local variables for naming or shared logic ├── main.tf                    # High-level resources: Fargate, S3, ECR, etc. ├── modules │   └── module-foundational-ecs │       ├── main.tf           # ECS cluster, task definition, service │       ├── variables.tf      # Inputs for ECS module │       ├── outputs.tf        # ECS module outputs │       └── README.md         # Documentation for ECS module usage ├── outputs.tf                 # Outputs from this root project ├── provider.tf                # AWS provider config + default_tags ├── versions.tf                # Terraform + providers version constraints ├── variables.tf               # Root-level input variables └── environments     ├── dev     │   ├── main.tf           # Environment-specific overrides for dev     │   └── terraform.tfvars  # Dev-specific variable values     └── nonprod         ├── main.tf           # Environment-specific overrides for nonprod         └── terraform.tfvars  # Nonprod-specific variable values`
+# Project Directory Structure
+
+Below is the high-level layout of this Terraform project, including key files and folders:
+
+```bash
+.
+├── .checkov.policy.yaml       # Custom Checkov rules for mandatory tags
+├── .gitignore                 # Ignore local Terraform state/cache files
+├── .tflint.hcl                # TFLint config: enforces required tag keys
+├── azure-pipelines.yml        # Azure DevOps pipeline for CI/CD
+├── backend.tf                 # Remote state backend config (S3 + DynamoDB)
+├── data.tf                    # Example data lookups (e.g., caller identity)
+├── locals.tf                  # Local variables for naming or shared logic
+├── main.tf                    # High-level resources: Fargate, S3, ECR, etc.
+├── modules
+│   └── module-foundational-ecs
+│       ├── main.tf           # ECS cluster, task definition, service
+│       ├── variables.tf      # Inputs for ECS module
+│       ├── outputs.tf        # ECS module outputs
+│       └── README.md         # Documentation for ECS module usage
+├── outputs.tf                 # Outputs from this root project
+├── provider.tf                # AWS provider config + default_tags
+├── versions.tf                # Terraform + providers version constraints
+├── variables.tf               # Root-level input variables
+└── environments
+    ├── dev
+    │   ├── main.tf           # Environment-specific overrides for dev
+    │   └── terraform.tfvars  # Dev-specific variable values
+    └── nonprod
+        ├── main.tf           # Environment-specific overrides for nonprod
+        └── terraform.tfvars  # Nonprod-specific variable values
+```
 
 * * *
 
