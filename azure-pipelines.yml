@@ -1,0 +1,79 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  TF_IN_AUTOMATION: true
+  AWS_REGION: 'eu-west-2'
+
+stages:
+- stage: Validate_and_Plan
+  displayName: "Validate & Plan"
+  jobs:
+    - job: Terraform_Validate
+      displayName: "Validate Terraform Code"
+      steps:
+        - task: Checkout@v2
+          displayName: "Checkout Code"
+
+        - script: |
+            sudo apt-get update
+            sudo apt-get install -y unzip wget python3-pip
+
+            # Install Terraform
+            wget https://releases.hashicorp.com/terraform/1.5.3/terraform_1.5.3_linux_amd64.zip
+            unzip terraform_1.5.3_linux_amd64.zip
+            sudo mv terraform /usr/local/bin/
+
+            # Install TFLint
+            curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+            sudo mv tflint /usr/local/bin/
+
+            # Install Checkov
+            pip3 install --upgrade pip
+            pip3 install checkov
+          displayName: "Install Terraform, TFLint, Checkov"
+
+        - script: |
+            terraform fmt -check
+            terraform validate
+            tflint --config .tflint.hcl
+            checkov --directory . --external-checks-dir . --framework terraform
+          displayName: "Format, Validate, Lint, Security Scan"
+
+        - script: |
+            # Adjust these backend configs as needed
+            terraform init -backend-config="bucket=$(backendBucket)" \
+                           -backend-config="region=$(AWS_REGION)" \
+                           -backend-config="dynamodb_table=$(backendDDBTable)"
+
+            terraform plan -out=tfplan
+          displayName: "Terraform Plan"
+
+- stage: Approval
+  displayName: "Manual Approval"
+  dependsOn: Validate_and_Plan
+  jobs:
+    - job: Wait_for_Approval
+      steps:
+        - task: ManualValidation@0
+          inputs:
+            instructions: "Please review the Terraform plan above."
+            onCancel: abort
+
+- stage: Apply
+  displayName: "Apply"
+  dependsOn: Approval
+  jobs:
+    - job: Terraform_Apply
+      steps:
+        - task: Checkout@v2
+
+        - script: |
+            terraform init -backend-config="bucket=$(backendBucket)" \
+                           -backend-config="region=$(AWS_REGION)" \
+                           -backend-config="dynamodb_table=$(backendDDBTable)"
+            terraform apply "tfplan"
+          displayName: "Terraform Apply"
