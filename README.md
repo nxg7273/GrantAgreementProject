@@ -28,11 +28,6 @@ It also demonstrates **mandatory corporate tagging** (e.g., `costcentre`, `busin
 * * *
 
 ## 2\. Repository Structure
-
-graphql
-
-Copy
-
 # Project Directory Structure
 
 Below is the high-level layout of this Terraform project, including key files and folders:
